@@ -1,56 +1,45 @@
 import { useEffect, useState } from 'react'
 import { useRole } from '../../lib/useRole'
-import type { Role } from '../../lib/role'
+import Step1, { type Step1Values } from './Step1'
+import Step2, { type Step2Values } from './Step2'
 
 type Step = 1 | 2
-
-const StepTitle = ({ step }: { step: Step }) => {
-  const titles: Record<Step, string> = {
-    1: 'Step 1 - Basic Information',
-    2: 'Step 2 - Additional Details',
-  }
-
-  return <h2 style={{ marginBottom: '0.5rem' }}>{titles[step]}</h2>
-}
-
-const Step1 = () => {
-  return (
-    <div>
-      <StepTitle step={1} />
-      <p style={{ margin: 0 }}>
-        Halaman ini hanya dapat diakses oleh role <strong>admin</strong>.
-      </p>
-      <p style={{ marginTop: '0.5rem' }}>
-        Tambahkan form Basic Info di sini (placeholder sementara).
-      </p>
-    </div>
-  )
-}
-
-const Step2 = ({ role }: { role: Role }) => {
-  return (
-    <div>
-      <StepTitle step={2} />
-      <p style={{ margin: 0 }}>
-        Step 2 terlihat oleh semua role. Role aktif: <strong>{role}</strong>.
-      </p>
-      <p style={{ marginTop: '0.5rem' }}>
-        Tambahkan form Detail atau review summary pada bagian ini.
-      </p>
-    </div>
-  )
-}
 
 const Wizard = () => {
   const { role } = useRole()
   const [step, setStep] = useState<Step>(role === 'admin' ? 1 : 2)
+  const [step1Values, setStep1Values] = useState<Step1Values>({
+    phone: '',
+    emergencyContact: '',
+  })
+  const [step2Values, setStep2Values] = useState<Step2Values>({
+    locationPreference: '',
+    notes: '',
+  })
 
   useEffect(() => {
     setStep(role === 'admin' ? 1 : 2)
   }, [role])
 
-  const handleNext = () => {
-    setStep((prev) => (prev < 2 ? ((prev + 1) as Step) : prev))
+  const handleStep1Change = (next: Step1Values) => {
+    setStep1Values(next)
+  }
+
+  const handleStep2Change = (next: Step2Values) => {
+    setStep2Values(next)
+  }
+
+  const handleStep1Next = () => {
+    setStep(2)
+  }
+
+  const handleStep2Submit = () => {
+    // Simpan ke store/API di implementasi berikutnya
+    console.log('Submit wizard data', {
+      role,
+      step1: step1Values,
+      step2: step2Values,
+    })
   }
 
   const handleBack = () => {
@@ -59,7 +48,6 @@ const Wizard = () => {
   }
 
   const isBackVisible = role === 'admin' && step > 1
-  const isNextDisabled = step === 2
 
   return (
     <section>
@@ -72,19 +60,27 @@ const Wizard = () => {
           marginBottom: '1rem',
         }}
       >
-        {step === 1 ? <Step1 /> : <Step2 role={role} />}
+        {step === 1 && role === 'admin' ? (
+          <Step1
+            value={step1Values}
+            onChange={handleStep1Change}
+            onNext={handleStep1Next}
+          />
+        ) : (
+          <Step2
+            role={role}
+            value={step2Values}
+            onChange={handleStep2Change}
+            onSubmit={handleStep2Submit}
+          />
+        )}
       </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
-        {isBackVisible && (
-          <button type="button" onClick={handleBack}>
-            Back
-          </button>
-        )}
-        <button type="button" onClick={handleNext} disabled={isNextDisabled}>
-          Next
+      {isBackVisible && (
+        <button type="button" onClick={handleBack}>
+          Back
         </button>
-      </div>
+      )}
     </section>
   )
 }
