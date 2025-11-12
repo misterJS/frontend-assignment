@@ -3,10 +3,12 @@ import type { Role } from '../../lib/role'
 import Autocomplete, {
   type AutocompleteOption,
 } from '../../components/Autocomplete'
+import PhotoPicker from '../../components/PhotoPicker'
 
 export interface Step2Values {
   department: AutocompleteOption | null
   location: AutocompleteOption | null
+  photoDataUrl: string | null
   notes: string
 }
 
@@ -43,8 +45,9 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
     () => ({
       department: value.department ? '' : 'Silakan pilih department.',
       location: value.location ? '' : 'Silakan pilih lokasi.',
+      photo: value.photoDataUrl ? '' : 'Foto wajib diunggah.',
     }),
-    [value.department, value.location],
+    [value.department, value.location, value.photoDataUrl],
   )
 
   const isValid = Object.values(errors).every((message) => !message)
@@ -68,8 +71,9 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
       <h2 style={{ marginBottom: '0.75rem' }}>Step 2 - Additional Details</h2>
       <p style={{ marginTop: 0, marginBottom: '1rem', color: '#475569' }}>
         Tahap ini dapat diakses oleh <strong>Admin</strong> maupun{' '}
-        <strong>Ops</strong>. Pilih departemen dan lokasi, lalu lengkapi catatan
-        tambahan. Role aktif saat ini: <strong>{role}</strong>.
+        <strong>Ops</strong>. Pilih departemen, lokasi, dan unggah foto sebagai
+        bagian dari verifikasi. Role aktif saat ini:{' '}
+        <strong>{role}</strong>.
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -108,6 +112,22 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
             <span style={errorStyle}>{errors.location}</span>
           )}
         </label>
+
+        <div style={labelStyle}>
+          <PhotoPicker
+            label="Foto Karyawan"
+            value={value.photoDataUrl}
+            onChange={(photo) =>
+              onChange({
+                ...value,
+                photoDataUrl: photo,
+              })
+            }
+          />
+          {submitAttempted && errors.photo && (
+            <span style={errorStyle}>{errors.photo}</span>
+          )}
+        </div>
 
         <label style={labelStyle}>
           <span>Catatan Tambahan</span>
