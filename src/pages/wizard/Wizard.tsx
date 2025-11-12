@@ -15,6 +15,7 @@ const Wizard = () => {
   const [step2Values, setStep2Values] = useState<Step2Values>({
     department: null,
     location: null,
+    employeeId: '',
     photoDataUrl: null,
     notes: '',
   })

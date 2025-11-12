@@ -1,13 +1,22 @@
-import { useMemo, useState, type ChangeEvent, type FormEvent } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from 'react'
+import axios from 'axios'
 import type { Role } from '../../lib/role'
 import Autocomplete, {
   type AutocompleteOption,
 } from '../../components/Autocomplete'
 import PhotoPicker from '../../components/PhotoPicker'
+import { makeEmpId } from '../../lib/empId'
 
 export interface Step2Values {
   department: AutocompleteOption | null
   location: AutocompleteOption | null
+  employeeId: string
   photoDataUrl: string | null
   notes: string
 }
@@ -40,14 +49,21 @@ const errorStyle = {
 
 const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
   const [submitAttempted, setSubmitAttempted] = useState(false)
+  const [isFetchingCount, setIsFetchingCount] = useState(false)
 
   const errors = useMemo(
     () => ({
       department: value.department ? '' : 'Silakan pilih department.',
       location: value.location ? '' : 'Silakan pilih lokasi.',
+      employeeId: value.employeeId ? '' : 'Employee ID belum terbentuk.',
       photo: value.photoDataUrl ? '' : 'Foto wajib diunggah.',
     }),
-    [value.department, value.location, value.photoDataUrl],
+    [
+      value.department,
+      value.employeeId,
+      value.location,
+      value.photoDataUrl,
+    ],
   )
 
   const isValid = Object.values(errors).every((message) => !message)
@@ -65,6 +81,44 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
       notes: event.target.value,
     })
   }
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      if (!value.department) {
+        onChange({ ...value, employeeId: '' })
+        return
+      }
+
+      setIsFetchingCount(true)
+
+      try {
+        const response = await axios.get(
+          'http://localhost:4001/basicInfo',
+          {
+            params: { departmentId: value.department.id },
+          },
+        )
+        const existingCount = Array.isArray(response.data)
+          ? response.data.length
+          : 0
+        onChange({
+          ...value,
+          employeeId: makeEmpId(
+            value.department?.name ?? '',
+            existingCount,
+          ),
+        })
+      } catch (error) {
+        console.error('Failed to fetch existing count', error)
+        onChange({ ...value, employeeId: '' })
+      } finally {
+        setIsFetchingCount(false)
+      }
+    }
+
+    fetchCount()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value.department])
 
   return (
     <form onSubmit={handleSubmit}>
@@ -94,6 +148,26 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
             <span style={errorStyle}>{errors.department}</span>
           )}
         </label>
+
+        <div style={labelStyle}>
+          <span>ID Karyawan</span>
+          <input
+            value={
+              isFetchingCount
+                ? 'Menghitung...'
+                : value.employeeId || ''
+            }
+            readOnly
+            style={{
+              ...inputStyle,
+              backgroundColor: '#f8fafc',
+              color: '#0f172a',
+            }}
+          />
+          {submitAttempted && errors.employeeId && (
+            <span style={errorStyle}>{errors.employeeId}</span>
+          )}
+        </div>
 
         <label style={labelStyle}>
           <span>Location</span>
