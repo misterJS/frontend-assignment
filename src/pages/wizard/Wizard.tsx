@@ -1,35 +1,68 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRole } from '../../lib/useRole'
+import useDraft from '../../lib/useDraft'
 import Step1, { type Step1Values } from './Step1'
 import Step2, { type Step2Values } from './Step2'
 
 type Step = 1 | 2
 
+const createInitialStep1Values = (): Step1Values => ({
+  phone: '',
+  emergencyContact: '',
+})
+
+const createInitialStep2Values = (): Step2Values => ({
+  department: null,
+  location: null,
+  employeeId: '',
+  photoDataUrl: null,
+  notes: '',
+})
+
+interface WizardDraft {
+  step1?: Step1Values
+  step2?: Step2Values
+}
+
 const Wizard = () => {
   const { role } = useRole()
+  const draftKey = useMemo(() => `draft_${role}`, [role])
+  const { save, load, clear } = useDraft<WizardDraft>(draftKey)
   const [step, setStep] = useState<Step>(role === 'admin' ? 1 : 2)
-  const [step1Values, setStep1Values] = useState<Step1Values>({
-    phone: '',
-    emergencyContact: '',
-  })
-  const [step2Values, setStep2Values] = useState<Step2Values>({
-    department: null,
-    location: null,
-    employeeId: '',
-    photoDataUrl: null,
-    notes: '',
-  })
+  const [step1Values, setStep1Values] = useState<Step1Values>(() =>
+    createInitialStep1Values(),
+  )
+  const [step2Values, setStep2Values] = useState<Step2Values>(() =>
+    createInitialStep2Values(),
+  )
 
   useEffect(() => {
     setStep(role === 'admin' ? 1 : 2)
   }, [role])
 
+  useEffect(() => {
+    const stored = load()
+    if (stored?.step1) {
+      setStep1Values(stored.step1)
+    } else {
+      setStep1Values(createInitialStep1Values())
+    }
+
+    if (stored?.step2) {
+      setStep2Values(stored.step2)
+    } else {
+      setStep2Values(createInitialStep2Values())
+    }
+  }, [load, role])
+
   const handleStep1Change = (next: Step1Values) => {
     setStep1Values(next)
+    save({ step1: next })
   }
 
   const handleStep2Change = (next: Step2Values) => {
     setStep2Values(next)
+    save({ step2: next })
   }
 
   const handleStep1Next = () => {
@@ -50,11 +83,30 @@ const Wizard = () => {
     setStep((prev) => (prev > 1 ? ((prev - 1) as Step) : prev))
   }
 
+  const handleClearDraft = () => {
+    clear()
+    setStep1Values(createInitialStep1Values())
+    setStep2Values(createInitialStep2Values())
+  }
+
   const isBackVisible = role === 'admin' && step > 1
 
   return (
     <section>
-      <h1 style={{ marginBottom: '1rem' }}>Wizard Simulasi</h1>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          marginBottom: '1rem',
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Wizard Simulasi</h1>
+        <button type="button" onClick={handleClearDraft}>
+          Clear Draft ({role})
+        </button>
+      </div>
       <div
         style={{
           border: '1px solid #cbd5f5',
