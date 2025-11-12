@@ -1,6 +1,7 @@
 import axios from 'axios'
 import {
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -52,21 +53,25 @@ const Autocomplete = <T extends AutocompleteOption>({
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const containerRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const listboxId = useId()
 
   const trimmedInput = inputValue.trim()
+  const hasQuery = trimmedInput.length >= minChars
 
   useEffect(() => {
     setInputValue(value?.name ?? '')
   }, [value?.name])
 
   useEffect(() => {
-    if (!trimmedInput || trimmedInput.length < minChars) {
+    if (!hasQuery) {
       setOptions([])
       setIsOpen(false)
+      setHighlightedIndex(-1)
       abortControllerRef.current?.abort()
       return
     }
 
+    setIsOpen(true)
     const timeoutId = window.setTimeout(async () => {
       abortControllerRef.current?.abort()
       const controller = new AbortController()
@@ -81,7 +86,6 @@ const Autocomplete = <T extends AutocompleteOption>({
           signal: controller.signal,
         })
         setOptions(response.data)
-        setIsOpen(response.data.length > 0)
         setHighlightedIndex(response.data.length ? 0 : -1)
       } catch (error) {
         if (!axios.isCancel(error)) {
@@ -96,7 +100,7 @@ const Autocomplete = <T extends AutocompleteOption>({
       window.clearTimeout(timeoutId)
       abortControllerRef.current?.abort()
     }
-  }, [debounceMs, endpoint, minChars, trimmedInput])
+  }, [debounceMs, endpoint, hasQuery, minChars, trimmedInput])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -111,7 +115,9 @@ const Autocomplete = <T extends AutocompleteOption>({
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value)
-    setIsOpen(false)
+    if (!event.target.value || event.target.value.length < minChars) {
+      setIsOpen(false)
+    }
   }
 
   const handleSelect = (option: T) => {
@@ -145,9 +151,11 @@ const Autocomplete = <T extends AutocompleteOption>({
   }
 
   const optionId = useMemo(
-    () => (highlightedIndex >= 0 ? `autocomplete-option-${highlightedIndex}` : ''),
-    [highlightedIndex],
+    () => (highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : ''),
+    [highlightedIndex, listboxId],
   )
+
+  const showEmptyState = !isLoading && hasQuery && options.length === 0
 
   return (
     <div
@@ -169,7 +177,7 @@ const Autocomplete = <T extends AutocompleteOption>({
         disabled={disabled}
         aria-autocomplete="list"
         aria-activedescendant={optionId || undefined}
-        aria-controls="autocomplete-options"
+        aria-controls={listboxId}
         style={{
           width: '100%',
           padding: '0.5rem 0.75rem',
@@ -179,34 +187,60 @@ const Autocomplete = <T extends AutocompleteOption>({
         }}
       />
 
-      {isOpen && options.length > 0 && (
+      {isOpen && (
         <ul
-          id="autocomplete-options"
+          id={listboxId}
           style={popupStyle}
           role="listbox"
           aria-label="Autocomplete suggestions"
         >
-          {options.map((option, index) => {
-            const isActive = index === highlightedIndex
-            return (
-              <li
-                id={`autocomplete-option-${index}`}
-                key={option.id}
-                role="option"
-                aria-selected={isActive}
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => handleSelect(option)}
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  cursor: 'pointer',
-                  backgroundColor: isActive ? '#2563eb' : 'transparent',
-                  color: isActive ? '#fff' : '#0f172a',
-                }}
-              >
-                {option.name}
-              </li>
-            )
-          })}
+          {isLoading && (
+            <li
+              style={{
+                padding: '0.5rem 0.75rem',
+                color: '#475569',
+                fontStyle: 'italic',
+              }}
+            >
+              Loading...
+            </li>
+          )}
+
+          {!isLoading && options.length > 0
+            ? options.map((option, index) => {
+                const isActive = index === highlightedIndex
+                return (
+                  <li
+                    id={`${listboxId}-option-${index}`}
+                    key={option.id}
+                    role="option"
+                    aria-selected={isActive}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => handleSelect(option)}
+                    style={{
+                      padding: '0.5rem 0.75rem',
+                      cursor: 'pointer',
+                      backgroundColor: isActive ? '#2563eb' : 'transparent',
+                      color: isActive ? '#fff' : '#0f172a',
+                    }}
+                  >
+                    {option.name}
+                  </li>
+                )
+              })
+            : null}
+
+          {showEmptyState && (
+            <li
+              style={{
+                padding: '0.5rem 0.75rem',
+                color: '#94a3b8',
+                fontStyle: 'italic',
+              }}
+            >
+              Tidak ada hasil
+            </li>
+          )}
         </ul>
       )}
 

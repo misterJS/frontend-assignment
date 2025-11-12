@@ -13,7 +13,8 @@ const Wizard = () => {
     emergencyContact: '',
   })
   const [step2Values, setStep2Values] = useState<Step2Values>({
-    locationPreference: '',
+    department: null,
+    location: null,
     notes: '',
   })
 
