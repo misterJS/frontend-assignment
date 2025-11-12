@@ -1,0 +1,39 @@
+{
+  "departments": [
+    {
+      "id": 1,
+      "name": "Engineering",
+      "head": "Adi"
+    },
+    {
+      "id": 2,
+      "name": "People Ops",
+      "head": "Sinta"
+    },
+    {
+      "id": 3,
+      "name": "Finance",
+      "head": "Rudi"
+    }
+  ],
+  "basicInfo": [
+    {
+      "id": 1,
+      "fullName": "Nadia Pratama",
+      "departmentId": 1,
+      "email": "nadia@example.com"
+    },
+    {
+      "id": 2,
+      "fullName": "Bimo Adikara",
+      "departmentId": 2,
+      "email": "bimo@example.com"
+    },
+    {
+      "id": 3,
+      "fullName": "Tiara Rahmi",
+      "departmentId": 3,
+      "email": "tiara@example.com"
+    }
+  ]
+}

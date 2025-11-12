@@ -1,0 +1,39 @@
+{
+  "locations": [
+    {
+      "id": "JKT",
+      "city": "Jakarta",
+      "country": "Indonesia"
+    },
+    {
+      "id": "BDG",
+      "city": "Bandung",
+      "country": "Indonesia"
+    },
+    {
+      "id": "SBY",
+      "city": "Surabaya",
+      "country": "Indonesia"
+    }
+  ],
+  "details": [
+    {
+      "id": 101,
+      "employeeId": 1,
+      "locationId": "JKT",
+      "position": "Frontend Engineer"
+    },
+    {
+      "id": 102,
+      "employeeId": 2,
+      "locationId": "BDG",
+      "position": "HR Business Partner"
+    },
+    {
+      "id": 103,
+      "employeeId": 3,
+      "locationId": "SBY",
+      "position": "Finance Analyst"
+    }
+  ]
+}
