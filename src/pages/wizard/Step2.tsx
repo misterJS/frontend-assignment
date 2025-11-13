@@ -37,25 +37,6 @@ interface Step2Props {
   onSubmit: () => void
 }
 
-const inputStyle = {
-  width: '100%',
-  padding: '0.5rem 0.75rem',
-  borderRadius: 6,
-  border: '1px solid #cbd5f5',
-  fontSize: '1rem',
-}
-
-const labelStyle = {
-  display: 'flex',
-  flexDirection: 'column' as const,
-  gap: '0.25rem',
-}
-
-const errorStyle = {
-  color: '#dc2626',
-  fontSize: '0.85rem',
-}
-
 const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
   const [submitAttempted, setSubmitAttempted] = useState(false)
   const [isFetchingCount, setIsFetchingCount] = useState(false)
@@ -188,18 +169,20 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
   }, [value.department])
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2 style={{ marginBottom: '0.75rem' }}>Step 2 - Additional Details</h2>
-      <p style={{ marginTop: 0, marginBottom: '1rem', color: '#475569' }}>
-        Tahap ini dapat diakses oleh <strong>Admin</strong> maupun{' '}
-        <strong>Ops</strong>. Pilih departemen, lokasi, dan unggah foto sebagai
-        bagian dari verifikasi. Role aktif saat ini:{' '}
-        <strong>{role}</strong>.
-      </p>
+    <form className="wizard-form" onSubmit={handleSubmit}>
+      <div>
+        <h2>Step 2 - Additional Details</h2>
+        <p className="wizard-form__description">
+          Tahap ini dapat diakses oleh <strong>Admin</strong> maupun{' '}
+          <strong>Ops</strong>. Pilih departemen, lokasi, dan unggah foto sebagai
+          bagian dari verifikasi. Role aktif saat ini:{' '}
+          <strong>{role}</strong>.
+        </p>
+      </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <label style={labelStyle}>
-          <span>Department</span>
+      <div className="u-grid">
+        <label className="form-field">
+          <span className="form-field__label">Department</span>
           <Autocomplete<DepartmentOption>
             endpoint="http://localhost:4001/departments"
             value={value.department}
@@ -214,38 +197,26 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
             }
           />
           {submitAttempted && errors.department && (
-            <span style={errorStyle}>{errors.department}</span>
+            <span className="form-field__error">{errors.department}</span>
           )}
         </label>
 
-        <div
-          style={{
-            ...labelStyle,
-            opacity: isSubmitting ? 0.65 : 1,
-            pointerEvents: isSubmitting ? 'none' : 'auto',
-          }}
-        >
-          <span>ID Karyawan</span>
+        <label className="form-field form-field--static">
+          <span className="form-field__label">ID Karyawan</span>
           <input
+            className="form-field__input"
             value={
-              isFetchingCount
-                ? 'Menghitung...'
-                : value.employeeId || ''
+              isFetchingCount ? 'Menghitung...' : value.employeeId || ''
             }
             readOnly
-            style={{
-              ...inputStyle,
-              backgroundColor: '#f8fafc',
-              color: '#0f172a',
-            }}
           />
           {submitAttempted && errors.employeeId && (
-            <span style={errorStyle}>{errors.employeeId}</span>
+            <span className="form-field__error">{errors.employeeId}</span>
           )}
-        </div>
+        </label>
 
-        <label style={labelStyle}>
-          <span>Location</span>
+        <label className="form-field">
+          <span className="form-field__label">Location</span>
           <Autocomplete<LocationOption>
             endpoint="http://localhost:4002/locations"
             value={value.location}
@@ -261,11 +232,15 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
             }
           />
           {submitAttempted && errors.location && (
-            <span style={errorStyle}>{errors.location}</span>
+            <span className="form-field__error">{errors.location}</span>
           )}
         </label>
 
-        <div style={labelStyle}>
+        <div
+          className={`form-field${
+            isSubmitting ? ' form-field--disabled' : ''
+          }`}
+        >
           <PhotoPicker
             label="Foto Karyawan"
             value={value.photoDataUrl}
@@ -277,21 +252,14 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
             }
           />
           {submitAttempted && errors.photo && (
-            <span style={errorStyle}>{errors.photo}</span>
+            <span className="form-field__error">{errors.photo}</span>
           )}
         </div>
 
         {(progress !== WizardProgress.READY || isSubmitting) && (
-          <div
-            style={{
-              border: '1px solid #e2e8f0',
-              borderRadius: 8,
-              padding: '0.75rem',
-              backgroundColor: '#f8fafc',
-            }}
-          >
-            <strong style={{ fontSize: '0.85rem' }}>Progress</strong>
-            <ol style={{ margin: '0.5rem 0 0', paddingLeft: '1.25rem' }}>
+          <div className="wizard-progress">
+            <strong className="wizard-progress__title">Progress</strong>
+            <ol className="wizard-progress__list">
               {progressSteps.map((stepStatus) => {
                 const isActive = progress === stepStatus
                 const stepIndex = progressSteps.indexOf(stepStatus)
@@ -300,15 +268,13 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
                 return (
                   <li
                     key={stepStatus}
-                    style={{
-                      color: isActive
-                        ? '#2563eb'
+                    className={`wizard-progress__item${
+                      isActive
+                        ? ' wizard-progress__item--active'
                         : isCompleted
-                          ? '#16a34a'
-                          : '#94a3b8',
-                      fontWeight: isActive ? 600 : 400,
-                      marginBottom: '0.25rem',
-                    }}
+                          ? ' wizard-progress__item--done'
+                          : ''
+                    }`}
                   >
                     {progressLabels[stepStatus]}
                   </li>
@@ -319,61 +285,34 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
         )}
 
         {errorMessage && (
-          <div
-            style={{
-              border: '1px solid #fecaca',
-              backgroundColor: '#fef2f2',
-              color: '#b91c1c',
-              borderRadius: 8,
-              padding: '0.75rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.5rem',
-            }}
-          >
+          <div className="wizard-error">
             <span>{errorMessage}</span>
             <button
               type="button"
               onClick={handleRetry}
               disabled={isSubmitting}
-              style={{
-                alignSelf: 'flex-start',
-                padding: '0.4rem 1rem',
-                borderRadius: 999,
-                border: 'none',
-                backgroundColor: '#dc2626',
-                color: '#fff',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-              }}
+              className="btn btn--danger btn--xs"
             >
               Retry
             </button>
           </div>
         )}
 
-        <label style={labelStyle}>
-          <span>Catatan Tambahan</span>
+        <label className="form-field">
+          <span className="form-field__label">Catatan Tambahan</span>
           <textarea
+            className="form-field__textarea form-field__textarea--lg"
             placeholder="Masukkan catatan atau checklist internal"
             value={value.notes}
             onChange={handleNotesChange}
             disabled={isSubmitting}
-            style={{ ...inputStyle, minHeight: 120, resize: 'vertical' }}
           />
         </label>
       </div>
 
       <button
         type="submit"
-        style={{
-          marginTop: '1.25rem',
-          padding: '0.5rem 1.5rem',
-          borderRadius: 999,
-          border: 'none',
-          backgroundColor: isValid ? '#16a34a' : '#94a3b8',
-          color: '#fff',
-          cursor: isValid && !isSubmitting ? 'pointer' : 'not-allowed',
-        }}
+        className="btn btn--primary"
         disabled={!isValid || isSubmitting}
       >
         {isSubmitting ? 'Processing...' : 'Submit'}

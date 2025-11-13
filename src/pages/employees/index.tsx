@@ -56,14 +56,18 @@ const EmployeesPage = () => {
 
   const renderContent = () => {
     if (isLoading) {
-      return <p style={{ color: '#475569' }}>Loading employees...</p>
+      return <div className="state state--muted">Loading employees...</div>
     }
 
     if (error) {
       return (
-        <div style={{ color: '#b91c1c' }}>
+        <div className="state state--error">
           <p>{error}</p>
-          <button type="button" onClick={() => handlePageChange(page)}>
+          <button
+            type="button"
+            onClick={() => handlePageChange(page)}
+            className="btn btn--danger btn--xs"
+          >
             Retry
           </button>
         </div>
@@ -71,48 +75,45 @@ const EmployeesPage = () => {
     }
 
     if (!records.length) {
-      return <p>Tidak ada data karyawan.</p>
+      return <div className="state state--muted">Tidak ada data karyawan.</div>
     }
 
     return (
       <>
-        <table
-          style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-          }}
-        >
-          <thead>
-            <tr style={{ textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>
-              <th style={{ padding: '0.75rem' }}>Name</th>
-              <th style={{ padding: '0.75rem' }}>Department</th>
-              <th style={{ padding: '0.75rem' }}>Role</th>
-              <th style={{ padding: '0.75rem' }}>Location</th>
-              <th style={{ padding: '0.75rem' }}>Photo</th>
-            </tr>
-          </thead>
-          <tbody>
-            {records.map((record) => (
-              <tr key={record.employeeId} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <td style={{ padding: '0.75rem' }}>{record.fullName || '\u2014'}</td>
-                <td style={{ padding: '0.75rem' }}>{record.department || '\u2014'}</td>
-                <td style={{ padding: '0.75rem' }}>{record.role || '\u2014'}</td>
-                <td style={{ padding: '0.75rem' }}>{record.location || 'N/A'}</td>
-                <td style={{ padding: '0.75rem' }}>
-                  {record.photo ? (
-                    <img
-                      src={record.photo}
-                      alt={record.fullName}
-                      style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: '50%' }}
-                    />
-                  ) : (
-                    '\u2014'
-                  )}
-                </td>
+        <div className="table-wrapper">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Role</th>
+                <th>Location</th>
+                <th>Photo</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {records.map((record) => (
+                <tr key={record.employeeId}>
+                  <td>{record.fullName || '\u2014'}</td>
+                  <td>{record.department || '\u2014'}</td>
+                  <td>{record.role || '\u2014'}</td>
+                  <td>{record.location || 'N/A'}</td>
+                  <td>
+                    {record.photo ? (
+                      <img
+                        src={record.photo}
+                        alt={record.fullName}
+                        className="table__photo"
+                      />
+                    ) : (
+                      '\u2014'
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         <Pagination page={page} limit={limit} total={total} onChange={handlePageChange} />
       </>
@@ -120,28 +121,10 @@ const EmployeesPage = () => {
   }
 
   return (
-    <section>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '1rem',
-        }}
-      >
-        <h1>Employees</h1>
-        <button
-          type="button"
-          onClick={handleAddEmployee}
-          style={{
-            padding: '0.5rem 1.5rem',
-            borderRadius: 999,
-            border: 'none',
-            backgroundColor: '#2563eb',
-            color: '#fff',
-            cursor: 'pointer',
-          }}
-        >
+    <section className="employees">
+      <div className="employees__header">
+        <h1 className="employees__title">Employees</h1>
+        <button type="button" onClick={handleAddEmployee} className="btn btn--primary">
           + Add Employee
         </button>
       </div>

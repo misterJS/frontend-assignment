@@ -27,18 +27,6 @@ interface AutocompleteProps<T extends AutocompleteOption = AutocompleteOption> {
   onSelect: (option: T) => void
 }
 
-const popupStyle = {
-  position: 'absolute' as const,
-  inset: 'calc(100% + 4px) 0 auto 0',
-  backgroundColor: '#fff',
-  border: '1px solid #cbd5f5',
-  borderRadius: 8,
-  boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
-  zIndex: 10,
-  maxHeight: 240,
-  overflowY: 'auto' as const,
-}
-
 const Autocomplete = <T extends AutocompleteOption>({
   endpoint,
   value = null,
@@ -93,14 +81,24 @@ const Autocomplete = <T extends AutocompleteOption>({
       setIsLoading(true)
 
       try {
+        const normalizedQuery = trimmedInput.toLowerCase()
         const response = await axios.get<T[]>(endpoint, {
           params: {
             [`${searchField}_like`]: trimmedInput,
           },
           signal: controller.signal,
         })
-        setOptions(response.data)
-        setHighlightedIndex(response.data.length ? 0 : -1)
+        const filtered =
+          normalizedQuery.length === 0
+            ? response.data
+            : response.data.filter((option) => {
+                const label = deriveLabel(option)
+                return label
+                  ?.toLowerCase()
+                  .includes(normalizedQuery)
+              })
+        setOptions(filtered)
+        setHighlightedIndex(filtered.length ? 0 : -1)
       } catch (error) {
         if (!axios.isCancel(error)) {
           console.error('Autocomplete fetch failed:', error)
@@ -174,11 +172,12 @@ const Autocomplete = <T extends AutocompleteOption>({
   return (
     <div
       ref={containerRef}
-      style={{ position: 'relative', width: '100%' }}
+      className="autocomplete"
       aria-expanded={isOpen}
     >
       <input
         type="text"
+        className="autocomplete__input"
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
@@ -192,30 +191,17 @@ const Autocomplete = <T extends AutocompleteOption>({
         aria-autocomplete="list"
         aria-activedescendant={optionId || undefined}
         aria-controls={listboxId}
-        style={{
-          width: '100%',
-          padding: '0.5rem 0.75rem',
-          borderRadius: 6,
-          border: '1px solid #cbd5f5',
-          fontSize: '1rem',
-        }}
       />
 
       {isOpen && (
         <ul
           id={listboxId}
-          style={popupStyle}
+          className="autocomplete__list"
           role="listbox"
           aria-label="Autocomplete suggestions"
         >
           {isLoading && (
-            <li
-              style={{
-                padding: '0.5rem 0.75rem',
-                color: '#475569',
-                fontStyle: 'italic',
-              }}
-            >
+            <li className="autocomplete__option autocomplete__option--muted">
               Loading...
             </li>
           )}
@@ -232,12 +218,9 @@ const Autocomplete = <T extends AutocompleteOption>({
                     aria-selected={isActive}
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => handleSelect(option)}
-                    style={{
-                      padding: '0.5rem 0.75rem',
-                      cursor: 'pointer',
-                      backgroundColor: isActive ? '#2563eb' : 'transparent',
-                      color: isActive ? '#fff' : '#0f172a',
-                    }}
+                    className={`autocomplete__option${
+                      isActive ? ' autocomplete__option--active' : ''
+                    }`}
                   >
                     {label || '(No label)'}
                   </li>
@@ -246,32 +229,15 @@ const Autocomplete = <T extends AutocompleteOption>({
             : null}
 
           {showEmptyState && (
-            <li
-              style={{
-                padding: '0.5rem 0.75rem',
-                color: '#94a3b8',
-                fontStyle: 'italic',
-              }}
-            >
+            <li className="autocomplete__option autocomplete__option--muted">
               Tidak ada hasil
             </li>
           )}
         </ul>
       )}
 
-      {isLoading && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            right: 12,
-            transform: 'translateY(-50%)',
-            fontSize: '0.85rem',
-            color: '#94a3b8',
-          }}
-        >
-          Loading...
-        </div>
+      {isLoading && !isOpen && (
+        <div className="autocomplete__status">Loading...</div>
       )}
     </div>
   )

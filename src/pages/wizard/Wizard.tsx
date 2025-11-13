@@ -96,29 +96,18 @@ const Wizard = () => {
   const isBackVisible = role === 'admin' && step > 1
 
   return (
-    <section>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '1rem',
-          marginBottom: '1rem',
-        }}
-      >
-        <h1 style={{ margin: 0 }}>Wizard Simulasi</h1>
-        <button type="button" onClick={handleClearDraft}>
+    <section className="wizard">
+      <div className="wizard__header">
+        <h1 className="wizard__title">Wizard Simulasi</h1>
+        <button
+          type="button"
+          onClick={handleClearDraft}
+          className="btn btn--ghost wizard-clear"
+        >
           Clear Draft ({role})
         </button>
       </div>
-      <div
-        style={{
-          border: '1px solid #cbd5f5',
-          borderRadius: 8,
-          padding: '1rem',
-          marginBottom: '1rem',
-        }}
-      >
+      <div className="wizard__card">
         {step === 1 && role === 'admin' ? (
           <Step1
             value={step1Values}
@@ -136,7 +125,11 @@ const Wizard = () => {
       </div>
 
       {isBackVisible && (
-        <button type="button" onClick={handleBack}>
+        <button
+          type="button"
+          onClick={handleBack}
+          className="btn btn--ghost wizard__back-button"
+        >
           Back
         </button>
       )}

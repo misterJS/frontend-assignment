@@ -11,32 +11,17 @@ const Pagination = ({ page, limit, total, onChange }: PaginationProps) => {
   const canNext = page < totalPages
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '1rem',
-        marginTop: '1rem',
-      }}
-    >
+    <div className="pagination">
       <button
         type="button"
         onClick={() => canPrev && onChange(page - 1)}
         disabled={!canPrev}
-        style={{
-          padding: '0.4rem 1rem',
-          borderRadius: 999,
-          border: '1px solid #cbd5f5',
-          backgroundColor: canPrev ? '#fff' : '#f1f5f9',
-          color: canPrev ? '#0f172a' : '#94a3b8',
-          cursor: canPrev ? 'pointer' : 'not-allowed',
-        }}
+        className="btn btn--ghost"
       >
         Prev
       </button>
 
-      <span style={{ fontSize: '0.9rem', color: '#475569' }}>
+      <span className="pagination__info">
         Page {page} of {totalPages} ({total} total)
       </span>
 
@@ -44,14 +29,7 @@ const Pagination = ({ page, limit, total, onChange }: PaginationProps) => {
         type="button"
         onClick={() => canNext && onChange(page + 1)}
         disabled={!canNext}
-        style={{
-          padding: '0.4rem 1rem',
-          borderRadius: 999,
-          border: '1px solid #cbd5f5',
-          backgroundColor: canNext ? '#fff' : '#f1f5f9',
-          color: canNext ? '#0f172a' : '#94a3b8',
-          cursor: canNext ? 'pointer' : 'not-allowed',
-        }}
+        className="btn btn--ghost"
       >
         Next
       </button>

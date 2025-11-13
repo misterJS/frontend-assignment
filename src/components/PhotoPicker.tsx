@@ -60,10 +60,8 @@ const PhotoPicker = ({
   }
 
   return (
-    <div>
-      <label style={{ display: 'block', fontWeight: 500, marginBottom: 8 }}>
-        {label}
-      </label>
+    <div className="photo-picker">
+      <span className="form-field__label">{label}</span>
       <input
         ref={inputRef}
         type="file"
@@ -73,48 +71,36 @@ const PhotoPicker = ({
       />
 
       {value ? (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '1rem',
-          }}
-        >
+        <div className="photo-picker__preview">
           <img
+            className="photo-picker__image"
             src={value}
             alt="Photo preview"
-            style={{
-              width: 120,
-              height: 120,
-              objectFit: 'cover',
-              borderRadius: 8,
-              border: '1px solid #e2e8f0',
-            }}
           />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <button type="button" onClick={handleReplace}>
+          <div className="photo-picker__actions">
+            <button type="button" onClick={handleReplace} className="btn btn--secondary btn--xs">
               Ganti Foto
             </button>
-            <button type="button" onClick={handleRemove}>
+            <button type="button" onClick={handleRemove} className="btn btn--ghost btn--xs">
               Hapus
             </button>
           </div>
         </div>
       ) : (
-        <button type="button" onClick={() => inputRef.current?.click()}>
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="btn btn--secondary btn--xs"
+        >
           Pilih Foto
         </button>
       )}
 
       {error && (
-        <p style={{ color: '#dc2626', fontSize: '0.85rem', marginTop: 8 }}>
-          {error}
-        </p>
+        <p className="photo-picker__error">{error}</p>
       )}
 
-      <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: 4 }}>
-        Format: JPG/PNG, maks {maxSizeMb} MB.
-      </p>
+      <p className="photo-picker__hint">Format: JPG/PNG, maks {maxSizeMb} MB.</p>
     </div>
   )
 }

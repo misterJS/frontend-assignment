@@ -11,25 +11,6 @@ interface Step1Props {
   onNext: () => void
 }
 
-const inputStyle = {
-  width: '100%',
-  padding: '0.5rem 0.75rem',
-  borderRadius: 6,
-  border: '1px solid #cbd5f5',
-  fontSize: '1rem',
-}
-
-const labelStyle = {
-  display: 'flex',
-  flexDirection: 'column' as const,
-  gap: '0.25rem',
-}
-
-const errorStyle = {
-  color: '#dc2626',
-  fontSize: '0.85rem',
-}
-
 const Step1 = ({ value, onChange, onNext }: Step1Props) => {
   const errors = useMemo(() => {
     const phone = value.phone.trim()
@@ -64,54 +45,48 @@ const Step1 = ({ value, onChange, onNext }: Step1Props) => {
     }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2 style={{ marginBottom: '0.75rem' }}>Step 1 - Basic Information</h2>
-      <p style={{ marginTop: 0, marginBottom: '1rem', color: '#475569' }}>
-        Input sederhana khusus Admin. Masukkan data valid sebelum lanjut ke step
-        berikutnya.
-      </p>
+    <form className="wizard-form" onSubmit={handleSubmit}>
+      <div>
+        <h2>Step 1 - Basic Information</h2>
+        <p className="wizard-form__description">
+          Input sederhana khusus Admin. Masukkan data valid sebelum lanjut ke
+          step berikutnya.
+        </p>
+      </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <label style={labelStyle}>
-          <span>Nomor Telepon</span>
+      <div className="u-grid">
+        <label className="form-field">
+          <span className="form-field__label">Nomor Telepon</span>
           <input
+            className="form-field__input"
             type="tel"
             inputMode="numeric"
             placeholder="cth: 08123456789"
             value={value.phone}
             onChange={handleFieldChange('phone')}
-            style={inputStyle}
           />
-          {errors.phone && <span style={errorStyle}>{errors.phone}</span>}
+          {errors.phone && (
+            <span className="form-field__error">{errors.phone}</span>
+          )}
         </label>
 
-        <label style={labelStyle}>
-          <span>Kontak Darurat</span>
+        <label className="form-field">
+          <span className="form-field__label">Kontak Darurat</span>
           <input
+            className="form-field__input"
             placeholder="Nama & nomor kontak"
             value={value.emergencyContact}
             onChange={handleFieldChange('emergencyContact')}
-            style={inputStyle}
           />
           {errors.emergencyContact && (
-            <span style={errorStyle}>{errors.emergencyContact}</span>
+            <span className="form-field__error">
+              {errors.emergencyContact}
+            </span>
           )}
         </label>
       </div>
 
-      <button
-        type="submit"
-        disabled={!isValid}
-        style={{
-          marginTop: '1.25rem',
-          padding: '0.5rem 1.25rem',
-          borderRadius: 999,
-          border: 'none',
-          backgroundColor: isValid ? '#2563eb' : '#94a3b8',
-          color: '#fff',
-          cursor: isValid ? 'pointer' : 'not-allowed',
-        }}
-      >
+      <button type="submit" disabled={!isValid} className="btn btn--primary">
         Next
       </button>
     </form>
