@@ -1,73 +1,51 @@
-# React + TypeScript + Vite
+# Frontend Assignment
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Demo: https://frontend-assignment-delta-eight.vercel.app
 
-Currently, two official plugins are available:
+Single-page React + Vite app with a wizard for registering employees and a paginated employees list. APIs are mocked with `json-server`; the app reads `VITE_API_STEP1`/`VITE_API_STEP2` so you can point it to any hosted JSON server (Vercel, Render, Railway, etc.).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Architecture Overview
 
-## React Compiler
+- **Tech stack**: Vite, React, TypeScript, Vitest, Testing Library, Tailwind-esque custom CSS utilities.
+- **Features**
+  - Role toggle (admin vs ops) stored in URL/query + context.
+  - Wizard with autosave drafts, role-based steps, photo upload, API progress indicator.
+  - Employees page with merged data from `/basicInfo` + `/details`, pagination, loading/error/empty states.
+  - Path alias `@/*` for cleaner imports.
+- **Mock endpoints** (json-server)
+  - `GET /departments`, `POST /basicInfo` on `VITE_API_STEP1`.
+  - `GET /locations`, `POST /details` on `VITE_API_STEP2`.
+  - `GET /basicInfo`, `GET /details` for employees page merge.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting Started
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run mock   # starts json-server on ports 4001/4002
+npm run dev    # Vite dev server (http://localhost:5173)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Set `VITE_API_STEP1`/`VITE_API_STEP2` (e.g. in `.env.local`) if you host the mocks elsewhere; otherwise defaults to `http://localhost:4001/4002`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Testing
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run test   # Vitest + Testing Library (jsdom)
 ```
+
+## Build & Deploy
+
+```bash
+npm run build  # Generates production bundle in dist
+```
+
+Deploy the contents of `dist` to Vercel/Netlify. On Vercel:
+
+1. Create a project from this repo.
+2. Set env vars:
+   - `VITE_API_STEP1=https://<your-step1-api>`
+   - `VITE_API_STEP2=https://<your-step2-api>`
+3. Build command: `npm run build` (default Vite settings).
+4. Optional preview/test: `npm run test`.
+
+Mock APIs must be hosted separately (another Vercel project or any Node host running `json-server`). Update the env vars to point to those URLs so the frontend works in production.
