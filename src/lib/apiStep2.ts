@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { API_STEP2_BASE_URL } from './apiConfig'
 
 export interface Location {
   id: string
@@ -12,8 +13,8 @@ export interface DetailPayload {
   position: string
 }
 
-const apiStep2 = axios.create({
-  baseURL: 'http://localhost:4002',
+export const apiStep2 = axios.create({
+  baseURL: API_STEP2_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

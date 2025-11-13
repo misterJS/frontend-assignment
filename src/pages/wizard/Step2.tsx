@@ -5,7 +5,6 @@ import {
   type ChangeEvent,
   type FormEvent,
 } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import type { Role } from '@/lib/role'
 import type { Step1Values } from './Step1'
@@ -16,6 +15,8 @@ import PhotoPicker from '@/components/PhotoPicker'
 import { makeEmpId } from '@/lib/empId'
 import delay from '@/lib/delay'
 import { WizardProgress, progressLabels } from '@/lib/progress'
+import apiStep1 from '@/lib/apiStep1'
+import apiStep2 from '@/lib/apiStep2'
 
 type DepartmentOption = AutocompleteOption & { name: string }
 type LocationOption = AutocompleteOption & { city: string; country: string }
@@ -79,7 +80,7 @@ const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
       setProgress(WizardProgress.POST_BASIC)
       const fullName =
         basicInfo.fullName.trim() || `Employee ${value.employeeId}`
-      await axios.post('http://localhost:4001/basicInfo', {
+      await apiStep1.post('/basicInfo', {
         id: basicId,
         employeeId: value.employeeId,
         departmentId: value.department?.id,
@@ -95,7 +96,7 @@ const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
       await delay(3000)
 
       setProgress(WizardProgress.POST_DETAILS)
-      await axios.post('http://localhost:4002/details', {
+      await apiStep2.post('/details', {
         id: detailId,
         employeeId: value.employeeId,
         locationId: value.location?.id,
@@ -150,7 +151,7 @@ const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
       setIsFetchingCount(true)
 
       try {
-        const response = await axios.get('http://localhost:4001/basicInfo', {
+        const response = await apiStep1.get('/basicInfo', {
           params: { departmentId: value.department.id },
         })
         const existingCount = Array.isArray(response.data)

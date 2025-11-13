@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { API_STEP1_BASE_URL, API_STEP2_BASE_URL } from './apiConfig'
 
 export interface BasicInfo {
   id: number | string
@@ -34,8 +35,8 @@ export interface FetchEmployeesParams {
   limit?: number
 }
 
-const STEP1_URL = 'http://localhost:4001/basicInfo'
-const STEP2_URL = 'http://localhost:4002/details'
+const STEP1_URL = `${API_STEP1_BASE_URL}/basicInfo`
+const STEP2_URL = `${API_STEP2_BASE_URL}/details`
 
 export const fetchEmployees = async ({
   page = 1,

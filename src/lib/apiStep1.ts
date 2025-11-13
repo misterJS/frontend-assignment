@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { API_STEP1_BASE_URL } from './apiConfig'
 
 export interface Department {
   id: number
@@ -12,8 +13,8 @@ export interface BasicInfoPayload {
   email: string
 }
 
-const apiStep1 = axios.create({
-  baseURL: 'http://localhost:4001',
+export const apiStep1 = axios.create({
+  baseURL: API_STEP1_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
