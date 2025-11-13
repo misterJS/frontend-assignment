@@ -1,21 +1,23 @@
 import axios from 'axios'
 
 export interface BasicInfo {
-  id: number
+  id: number | string
   employeeId?: string
   fullName: string
   departmentId?: number
   department?: string
   email: string
   role?: string
+  createdAt?: number
 }
 
 export interface DetailInfo {
-  id: number
+  id: number | string
   employeeId?: string
   locationId?: string
   location?: string
   photo?: string
+  createdAt?: number
 }
 
 export interface EmployeeRecord {
@@ -35,13 +37,6 @@ export interface FetchEmployeesParams {
 const STEP1_URL = 'http://localhost:4001/basicInfo'
 const STEP2_URL = 'http://localhost:4002/details'
 
-const buildQuery = (params: FetchEmployeesParams = {}) => {
-  const query = new URLSearchParams()
-  if (params.page) query.set('_page', params.page.toString())
-  if (params.limit) query.set('_limit', params.limit.toString())
-  return query.toString()
-}
-
 export const fetchEmployees = async ({
   page = 1,
   limit = 10,
@@ -49,16 +44,12 @@ export const fetchEmployees = async ({
   data: EmployeeRecord[]
   total: number
 }> => {
-  const query = buildQuery({ page, limit })
   const [basicResp, detailsResp] = await Promise.all([
-    axios.get<BasicInfo[]>(`${STEP1_URL}?${query}`),
-    axios.get<DetailInfo[]>(`${STEP2_URL}?${query}`),
+    axios.get<BasicInfo[]>(STEP1_URL),
+    axios.get<DetailInfo[]>(STEP2_URL),
   ])
 
-  const total =
-    Number(basicResp.headers['x-total-count']) ||
-    basicResp.data.length ||
-    0
+  const total = basicResp.data.length
 
   const detailsMap = new Map<string, DetailInfo>()
   detailsResp.data.forEach((detail) => {
@@ -68,7 +59,20 @@ export const fetchEmployees = async ({
     }
   })
 
-  const merged = basicResp.data.map((basic) => {
+  const sortedBasics = [...basicResp.data].sort((a, b) => {
+    const toNumber = (entry: BasicInfo) => {
+      if (entry.createdAt) return entry.createdAt
+      const numericId = Number(entry.id)
+      if (!Number.isNaN(numericId)) return numericId
+      return 0
+    }
+    return toNumber(b) - toNumber(a)
+  })
+
+  const start = (page - 1) * limit
+  const pagedBasics = sortedBasics.slice(start, start + limit)
+
+  const merged = pagedBasics.map((basic) => {
     const employeeId =
       (basic.employeeId ?? basic.id?.toString()) ?? ''
     const detail = detailsMap.get(employeeId)

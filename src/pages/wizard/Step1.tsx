@@ -1,6 +1,7 @@
 import { useMemo, type ChangeEvent, type FormEvent } from 'react'
 
 export interface Step1Values {
+  fullName: string
   phone: string
   emergencyContact: string
 }
@@ -15,8 +16,10 @@ const Step1 = ({ value, onChange, onNext }: Step1Props) => {
   const errors = useMemo(() => {
     const phone = value.phone.trim()
     const emergency = value.emergencyContact.trim()
+    const fullName = value.fullName.trim()
 
     return {
+      fullName: fullName ? '' : 'Nama lengkap wajib diisi.',
       phone:
         phone.length < 9
           ? 'Nomor telepon minimal 9 karakter.'
@@ -55,6 +58,19 @@ const Step1 = ({ value, onChange, onNext }: Step1Props) => {
       </div>
 
       <div className="u-grid">
+        <label className="form-field">
+          <span className="form-field__label">Nama Lengkap</span>
+          <input
+            className="form-field__input"
+            placeholder="cth: Anya Zahra"
+            value={value.fullName}
+            onChange={handleFieldChange('fullName')}
+          />
+          {errors.fullName && (
+            <span className="form-field__error">{errors.fullName}</span>
+          )}
+        </label>
+
         <label className="form-field">
           <span className="form-field__label">Nomor Telepon</span>
           <input

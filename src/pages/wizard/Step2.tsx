@@ -8,6 +8,7 @@ import {
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import type { Role } from '../../lib/role'
+import type { Step1Values } from './Step1'
 import Autocomplete, {
   type AutocompleteOption,
 } from '../../components/Autocomplete'
@@ -32,12 +33,13 @@ export interface Step2Values {
 
 interface Step2Props {
   role: Role
+  basicInfo: Step1Values
   value: Step2Values
   onChange: (value: Step2Values) => void
   onSubmit: () => void
 }
 
-const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
+const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
   const [submitAttempted, setSubmitAttempted] = useState(false)
   const [isFetchingCount, setIsFetchingCount] = useState(false)
   const [progress, setProgress] = useState<WizardProgress>(WizardProgress.READY)
@@ -77,22 +79,38 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
     setErrorMessage(null)
 
     try {
+      const basicTimestamp = Date.now()
+      const detailTimestamp = basicTimestamp + 1
+      const basicId = `z-${basicTimestamp}`
+      const detailId = `z-${detailTimestamp}`
+
       setProgress(WizardProgress.POST_BASIC)
+      const fullName =
+        basicInfo.fullName.trim() || `Employee ${value.employeeId}`
       await axios.post('http://localhost:4001/basicInfo', {
+        id: basicId,
         employeeId: value.employeeId,
         departmentId: value.department?.id,
-        fullName: `Employee ${value.employeeId}`,
+        department: value.department?.name,
+        fullName,
         email: `${value.employeeId.toLowerCase()}@example.com`,
+        role,
+        phone: basicInfo.phone,
+        emergencyContact: basicInfo.emergencyContact,
         notes: value.notes,
+        createdAt: basicTimestamp,
       })
       await delay(3000)
 
       setProgress(WizardProgress.POST_DETAILS)
       await axios.post('http://localhost:4002/details', {
+        id: detailId,
         employeeId: value.employeeId,
         locationId: value.location?.id,
+        location: value.location?.city,
         photo: value.photoDataUrl,
         notes: value.notes,
+        createdAt: detailTimestamp,
       })
       await delay(3000)
 

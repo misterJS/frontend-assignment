@@ -14,58 +14,69 @@
       "id": "3",
       "name": "Finance",
       "head": "Rudi"
+    },
+    {
+      "id": "4",
+      "name": "Marketing",
+      "head": "Maya"
+    },
+    {
+      "id": "5",
+      "name": "Sales",
+      "head": "Budi"
+    },
+    {
+      "id": "6",
+      "name": "Product",
+      "head": "Nanda"
+    },
+    {
+      "id": "7",
+      "name": "Design",
+      "head": "Citra"
+    },
+    {
+      "id": "8",
+      "name": "Quality Assurance",
+      "head": "Dimas"
+    },
+    {
+      "id": "9",
+      "name": "IT Support",
+      "head": "Farah"
+    },
+    {
+      "id": "10",
+      "name": "Legal",
+      "head": "Hendra"
     }
   ],
   "basicInfo": [
     {
-      "id": "1",
-      "fullName": "Nadia Pratama",
-      "departmentId": 1,
-      "email": "nadia@example.com"
+      "id": "z-1763000043916",
+      "employeeId": "DXX-001",
+      "departmentId": "7",
+      "department": "Design",
+      "fullName": "Employee DXX-001",
+      "email": "dxx-001@example.com",
+      "role": "ops",
+      "phone": "",
+      "emergencyContact": "",
+      "notes": "",
+      "createdAt": 1763000043916
     },
     {
-      "id": "2",
-      "fullName": "Bimo Adikara",
-      "departmentId": 2,
-      "email": "bimo@example.com"
-    },
-    {
-      "id": "3",
-      "fullName": "Tiara Rahmi",
-      "departmentId": 3,
-      "email": "tiara@example.com"
-    },
-    {
-      "id": "c2de",
-      "employeeId": "FXX-002",
-      "departmentId": "3",
-      "fullName": "Employee FXX-002",
-      "email": "fxx-002@example.com",
-      "notes": "asdknasjd"
-    },
-    {
-      "id": "964b",
-      "employeeId": "POX-002",
-      "departmentId": "2",
-      "fullName": "Employee POX-002",
-      "email": "pox-002@example.com",
-      "notes": ""
-    },
-    {
-      "id": "d6a1",
-      "employeeId": "POX-003",
-      "departmentId": "2",
-      "fullName": "Employee POX-003",
-      "email": "pox-003@example.com",
-      "notes": "test"
-    },
-    {
-      "id": "4039",
-      "employeeId": "EXX-002",
+      "id": "z-1763000093293",
+      "employeeId": "EXX-001",
       "departmentId": "1",
-      "fullName": "Employee EXX-002",
-      "email": "exx-002@example.com",
-      "notes": "jasdbjasbd"
+      "department": "Engineering",
+      "fullName": "Aku beno",
+      "email": "exx-001@example.com",
+      "role": "admin",
+      "phone": "08128838128",
+      "emergencyContact": "08128177122",
+      "notes": "",
+      "createdAt": 1763000093293
     }
   ]
 }

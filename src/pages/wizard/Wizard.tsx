@@ -7,6 +7,7 @@ import Step2, { type Step2Values } from './Step2'
 type Step = 1 | 2
 
 const createInitialStep1Values = (): Step1Values => ({
+  fullName: '',
   phone: '',
   emergencyContact: '',
 })
@@ -117,6 +118,7 @@ const Wizard = () => {
         ) : (
           <Step2
             role={role}
+            basicInfo={step1Values}
             value={step2Values}
             onChange={handleStep2Change}
             onSubmit={handleStep2Submit}
