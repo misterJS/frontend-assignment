@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {
+  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -11,7 +12,6 @@ import {
 
 export interface AutocompleteOption {
   id: number | string
-  name: string
   [key: string]: unknown
 }
 
@@ -22,6 +22,8 @@ interface AutocompleteProps<T extends AutocompleteOption = AutocompleteOption> {
   minChars?: number
   debounceMs?: number
   disabled?: boolean
+  searchField?: string
+  getOptionLabel?: (option: T) => string
   onSelect: (option: T) => void
 }
 
@@ -44,9 +46,21 @@ const Autocomplete = <T extends AutocompleteOption>({
   minChars = 1,
   debounceMs = 300,
   disabled = false,
+  searchField = 'name',
+  getOptionLabel,
   onSelect,
 }: AutocompleteProps<T>) => {
-  const [inputValue, setInputValue] = useState(value?.name ?? '')
+  const deriveLabel = useCallback(
+    (option: T | null) => {
+      if (!option) return ''
+      if (getOptionLabel) return getOptionLabel(option)
+      const label = (option as AutocompleteOption & { name?: string }).name
+      return typeof label === 'string' ? label : ''
+    },
+    [getOptionLabel],
+  )
+
+  const [inputValue, setInputValue] = useState(deriveLabel(value))
   const [options, setOptions] = useState<T[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -59,8 +73,8 @@ const Autocomplete = <T extends AutocompleteOption>({
   const hasQuery = trimmedInput.length >= minChars
 
   useEffect(() => {
-    setInputValue(value?.name ?? '')
-  }, [value?.name])
+    setInputValue(deriveLabel(value))
+  }, [deriveLabel, value])
 
   useEffect(() => {
     if (!hasQuery) {
@@ -81,7 +95,7 @@ const Autocomplete = <T extends AutocompleteOption>({
       try {
         const response = await axios.get<T[]>(endpoint, {
           params: {
-            name_like: trimmedInput,
+            [`${searchField}_like`]: trimmedInput,
           },
           signal: controller.signal,
         })
@@ -100,7 +114,7 @@ const Autocomplete = <T extends AutocompleteOption>({
       window.clearTimeout(timeoutId)
       abortControllerRef.current?.abort()
     }
-  }, [debounceMs, endpoint, hasQuery, minChars, trimmedInput])
+  }, [debounceMs, endpoint, hasQuery, minChars, searchField, trimmedInput])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -121,7 +135,7 @@ const Autocomplete = <T extends AutocompleteOption>({
   }
 
   const handleSelect = (option: T) => {
-    setInputValue(option.name)
+    setInputValue(deriveLabel(option))
     setIsOpen(false)
     setOptions([])
     setHighlightedIndex(-1)
@@ -209,6 +223,7 @@ const Autocomplete = <T extends AutocompleteOption>({
           {!isLoading && options.length > 0
             ? options.map((option, index) => {
                 const isActive = index === highlightedIndex
+                const label = deriveLabel(option)
                 return (
                   <li
                     id={`${listboxId}-option-${index}`}
@@ -224,7 +239,7 @@ const Autocomplete = <T extends AutocompleteOption>({
                       color: isActive ? '#fff' : '#0f172a',
                     }}
                   >
-                    {option.name}
+                    {label || '(No label)'}
                   </li>
                 )
               })

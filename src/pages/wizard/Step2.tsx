@@ -13,9 +13,12 @@ import Autocomplete, {
 import PhotoPicker from '../../components/PhotoPicker'
 import { makeEmpId } from '../../lib/empId'
 
+type DepartmentOption = AutocompleteOption & { name: string }
+type LocationOption = AutocompleteOption & { city: string; country: string }
+
 export interface Step2Values {
-  department: AutocompleteOption | null
-  location: AutocompleteOption | null
+  department: DepartmentOption | null
+  location: LocationOption | null
   employeeId: string
   photoDataUrl: string | null
   notes: string
@@ -133,10 +136,11 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <label style={labelStyle}>
           <span>Department</span>
-          <Autocomplete
+          <Autocomplete<DepartmentOption>
             endpoint="http://localhost:4001/departments"
             value={value.department}
             placeholder="Cari department..."
+            getOptionLabel={(option) => option.name}
             onSelect={(option) =>
               onChange({
                 ...value,
@@ -171,10 +175,12 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
 
         <label style={labelStyle}>
           <span>Location</span>
-          <Autocomplete
+          <Autocomplete<LocationOption>
             endpoint="http://localhost:4002/locations"
             value={value.location}
             placeholder="Cari lokasi..."
+            searchField="city"
+            getOptionLabel={(option) => option.city}
             onSelect={(option) =>
               onChange({
                 ...value,
