@@ -2,53 +2,43 @@
   "locations": [
     {
       "id": "JKT",
-      "city": "Jakarta",
-      "country": "Indonesia"
+      "city": "Jakarta"
     },
     {
       "id": "BDG",
-      "city": "Bandung",
-      "country": "Indonesia"
+      "city": "Bandung"
     },
     {
       "id": "SBY",
-      "city": "Surabaya",
-      "country": "Indonesia"
+      "city": "Surabaya"
     },
     {
       "id": "BKS",
-      "city": "Bekasi",
-      "country": "Indonesia"
+      "city": "Bekasi"
     },
     {
       "id": "MDN",
-      "city": "Medan",
-      "country": "Indonesia"
+      "city": "Medan"
     },
     {
       "id": "JOG",
-      "city": "Yogyakarta",
-      "country": "Indonesia"
+      "city": "Yogyakarta"
     },
     {
       "id": "SMG",
-      "city": "Semarang",
-      "country": "Indonesia"
+      "city": "Semarang"
     },
     {
       "id": "MKS",
-      "city": "Makassar",
-      "country": "Indonesia"
+      "city": "Makassar"
     },
     {
       "id": "DPS",
-      "city": "Denpasar",
-      "country": "Indonesia"
+      "city": "Denpasar"
     },
     {
       "id": "BPN",
-      "city": "Balikpapan",
-      "country": "Indonesia"
+      "city": "Balikpapan"
     }
   ],
   "details": [
