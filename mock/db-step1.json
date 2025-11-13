@@ -1,39 +1,47 @@
 {
   "departments": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Engineering",
       "head": "Adi"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "People Ops",
       "head": "Sinta"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Finance",
       "head": "Rudi"
     }
   ],
   "basicInfo": [
     {
-      "id": 1,
+      "id": "1",
       "fullName": "Nadia Pratama",
       "departmentId": 1,
       "email": "nadia@example.com"
     },
     {
-      "id": 2,
+      "id": "2",
       "fullName": "Bimo Adikara",
       "departmentId": 2,
       "email": "bimo@example.com"
     },
     {
-      "id": 3,
+      "id": "3",
       "fullName": "Tiara Rahmi",
       "departmentId": 3,
       "email": "tiara@example.com"
+    },
+    {
+      "id": "c2de",
+      "employeeId": "FXX-002",
+      "departmentId": "3",
+      "fullName": "Employee FXX-002",
+      "email": "fxx-002@example.com",
+      "notes": "asdknasjd"
     }
   ]
 }

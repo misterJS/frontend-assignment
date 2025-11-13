@@ -43,13 +43,13 @@ const Wizard = () => {
   useEffect(() => {
     const stored = load()
     if (stored?.step1) {
-      setStep1Values(stored.step1)
+      setStep1Values({ ...createInitialStep1Values(), ...stored.step1 })
     } else {
       setStep1Values(createInitialStep1Values())
     }
 
     if (stored?.step2) {
-      setStep2Values(stored.step2)
+      setStep2Values({ ...createInitialStep2Values(), ...stored.step2 })
     } else {
       setStep2Values(createInitialStep2Values())
     }
@@ -70,12 +70,15 @@ const Wizard = () => {
   }
 
   const handleStep2Submit = () => {
-    // Simpan ke store/API di implementasi berikutnya
     console.log('Submit wizard data', {
       role,
       step1: step1Values,
       step2: step2Values,
     })
+    clear()
+    setStep1Values(createInitialStep1Values())
+    setStep2Values(createInitialStep2Values())
+    setStep(role === 'admin' ? 1 : 2)
   }
 
   const handleBack = () => {
@@ -87,6 +90,7 @@ const Wizard = () => {
     clear()
     setStep1Values(createInitialStep1Values())
     setStep2Values(createInitialStep2Values())
+    setStep(role === 'admin' ? 1 : 2)
   }
 
   const isBackVisible = role === 'admin' && step > 1

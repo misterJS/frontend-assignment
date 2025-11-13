@@ -6,12 +6,18 @@ import {
   type FormEvent,
 } from 'react'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 import type { Role } from '../../lib/role'
 import Autocomplete, {
   type AutocompleteOption,
 } from '../../components/Autocomplete'
 import PhotoPicker from '../../components/PhotoPicker'
 import { makeEmpId } from '../../lib/empId'
+import delay from '../../lib/delay'
+import {
+  WizardProgress,
+  progressLabels,
+} from '../../lib/progress'
 
 type DepartmentOption = AutocompleteOption & { name: string }
 type LocationOption = AutocompleteOption & { city: string; country: string }
@@ -53,6 +59,19 @@ const errorStyle = {
 const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
   const [submitAttempted, setSubmitAttempted] = useState(false)
   const [isFetchingCount, setIsFetchingCount] = useState(false)
+  const [progress, setProgress] = useState<WizardProgress>(WizardProgress.READY)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate()
+
+  const progressSteps: WizardProgress[] = [
+    WizardProgress.READY,
+    WizardProgress.POST_BASIC,
+    WizardProgress.POST_DETAILS,
+    WizardProgress.VERIFY,
+    WizardProgress.DONE,
+  ]
+  const currentProgressIndex = progressSteps.indexOf(progress)
 
   const errors = useMemo(
     () => ({
@@ -71,11 +90,56 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
 
   const isValid = Object.values(errors).every((message) => !message)
 
+  const executeSubmit = async () => {
+    if (isSubmitting) return
+    setIsSubmitting(true)
+    setErrorMessage(null)
+
+    try {
+      setProgress(WizardProgress.POST_BASIC)
+      await axios.post('http://localhost:4001/basicInfo', {
+        employeeId: value.employeeId,
+        departmentId: value.department?.id,
+        fullName: `Employee ${value.employeeId}`,
+        email: `${value.employeeId.toLowerCase()}@example.com`,
+        notes: value.notes,
+      })
+      await delay(3000)
+
+      setProgress(WizardProgress.POST_DETAILS)
+      await axios.post('http://localhost:4002/details', {
+        employeeId: value.employeeId,
+        locationId: value.location?.id,
+        photo: value.photoDataUrl,
+        notes: value.notes,
+      })
+      await delay(3000)
+
+      setProgress(WizardProgress.VERIFY)
+      await delay(1000)
+
+      setProgress(WizardProgress.DONE)
+      onSubmit()
+      navigate('/employees')
+    } catch (error) {
+      console.error('Submit failed', error)
+      setErrorMessage('Submit gagal. Silakan coba lagi.')
+      setProgress(WizardProgress.READY)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSubmitAttempted(true)
     if (!isValid) return
-    onSubmit()
+    executeSubmit()
+  }
+
+  const handleRetry = () => {
+    if (!isValid || isSubmitting) return
+    executeSubmit()
   }
 
   const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -141,6 +205,7 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
             value={value.department}
             placeholder="Cari department..."
             getOptionLabel={(option) => option.name}
+            disabled={isSubmitting}
             onSelect={(option) =>
               onChange({
                 ...value,
@@ -153,7 +218,13 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
           )}
         </label>
 
-        <div style={labelStyle}>
+        <div
+          style={{
+            ...labelStyle,
+            opacity: isSubmitting ? 0.65 : 1,
+            pointerEvents: isSubmitting ? 'none' : 'auto',
+          }}
+        >
           <span>ID Karyawan</span>
           <input
             value={
@@ -181,6 +252,7 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
             placeholder="Cari lokasi..."
             searchField="city"
             getOptionLabel={(option) => option.city}
+            disabled={isSubmitting}
             onSelect={(option) =>
               onChange({
                 ...value,
@@ -209,12 +281,83 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
           )}
         </div>
 
+        {(progress !== WizardProgress.READY || isSubmitting) && (
+          <div
+            style={{
+              border: '1px solid #e2e8f0',
+              borderRadius: 8,
+              padding: '0.75rem',
+              backgroundColor: '#f8fafc',
+            }}
+          >
+            <strong style={{ fontSize: '0.85rem' }}>Progress</strong>
+            <ol style={{ margin: '0.5rem 0 0', paddingLeft: '1.25rem' }}>
+              {progressSteps.map((stepStatus) => {
+                const isActive = progress === stepStatus
+                const stepIndex = progressSteps.indexOf(stepStatus)
+                const isCompleted =
+                  stepIndex > -1 && stepIndex < currentProgressIndex
+                return (
+                  <li
+                    key={stepStatus}
+                    style={{
+                      color: isActive
+                        ? '#2563eb'
+                        : isCompleted
+                          ? '#16a34a'
+                          : '#94a3b8',
+                      fontWeight: isActive ? 600 : 400,
+                      marginBottom: '0.25rem',
+                    }}
+                  >
+                    {progressLabels[stepStatus]}
+                  </li>
+                )
+              })}
+            </ol>
+          </div>
+        )}
+
+        {errorMessage && (
+          <div
+            style={{
+              border: '1px solid #fecaca',
+              backgroundColor: '#fef2f2',
+              color: '#b91c1c',
+              borderRadius: 8,
+              padding: '0.75rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.5rem',
+            }}
+          >
+            <span>{errorMessage}</span>
+            <button
+              type="button"
+              onClick={handleRetry}
+              disabled={isSubmitting}
+              style={{
+                alignSelf: 'flex-start',
+                padding: '0.4rem 1rem',
+                borderRadius: 999,
+                border: 'none',
+                backgroundColor: '#dc2626',
+                color: '#fff',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         <label style={labelStyle}>
           <span>Catatan Tambahan</span>
           <textarea
             placeholder="Masukkan catatan atau checklist internal"
             value={value.notes}
             onChange={handleNotesChange}
+            disabled={isSubmitting}
             style={{ ...inputStyle, minHeight: 120, resize: 'vertical' }}
           />
         </label>
@@ -229,10 +372,11 @@ const Step2 = ({ role, value, onChange, onSubmit }: Step2Props) => {
           border: 'none',
           backgroundColor: isValid ? '#16a34a' : '#94a3b8',
           color: '#fff',
-          cursor: isValid ? 'pointer' : 'not-allowed',
+          cursor: isValid && !isSubmitting ? 'pointer' : 'not-allowed',
         }}
+        disabled={!isValid || isSubmitting}
       >
-        Submit
+        {isSubmitting ? 'Processing...' : 'Submit'}
       </button>
     </form>
   )
