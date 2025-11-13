@@ -14,7 +14,11 @@ import Autocomplete, {
 import PhotoPicker from '@/components/PhotoPicker'
 import { makeEmpId } from '@/lib/empId'
 import delay from '@/lib/delay'
-import { WizardProgress, progressLabels } from '@/lib/progress'
+import {
+  WizardProgress,
+  type WizardProgressValue,
+  progressLabels,
+} from '@/lib/progress'
 import apiStep1 from '@/lib/apiStep1'
 import apiStep2 from '@/lib/apiStep2'
 
@@ -40,12 +44,14 @@ interface Step2Props {
 const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
   const [submitAttempted, setSubmitAttempted] = useState(false)
   const [isFetchingCount, setIsFetchingCount] = useState(false)
-  const [progress, setProgress] = useState<WizardProgress>(WizardProgress.READY)
+  const [progress, setProgress] = useState<WizardProgressValue>(
+    WizardProgress.READY,
+  )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
 
-  const progressSteps: WizardProgress[] = [
+  const progressSteps: WizardProgressValue[] = [
     WizardProgress.READY,
     WizardProgress.POST_BASIC,
     WizardProgress.POST_DETAILS,

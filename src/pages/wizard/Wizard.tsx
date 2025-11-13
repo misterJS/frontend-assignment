@@ -20,7 +20,7 @@ const createInitialStep2Values = (): Step2Values => ({
   notes: '',
 })
 
-interface WizardDraft {
+interface WizardDraft extends Record<string, unknown> {
   step1?: Step1Values
   step2?: Step2Values
 }
