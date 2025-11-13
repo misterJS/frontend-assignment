@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import Pagination from '../../components/Pagination'
-import { fetchEmployees, type EmployeeRecord } from '../../lib/employees'
+import Pagination from '@/components/Pagination'
+import { fetchEmployees, type EmployeeRecord } from '@/lib/employees'
 
 const DEFAULT_LIMIT = 5
 

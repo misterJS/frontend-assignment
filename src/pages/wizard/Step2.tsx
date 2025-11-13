@@ -7,18 +7,18 @@ import {
 } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import type { Role } from '../../lib/role'
+import type { Role } from '@/lib/role'
 import type { Step1Values } from './Step1'
 import Autocomplete, {
   type AutocompleteOption,
-} from '../../components/Autocomplete'
-import PhotoPicker from '../../components/PhotoPicker'
-import { makeEmpId } from '../../lib/empId'
-import delay from '../../lib/delay'
+} from '@/components/Autocomplete'
+import PhotoPicker from '@/components/PhotoPicker'
+import { makeEmpId } from '@/lib/empId'
+import delay from '@/lib/delay'
 import {
   WizardProgress,
   progressLabels,
-} from '../../lib/progress'
+} from '@/lib/progress'
 
 type DepartmentOption = AutocompleteOption & { name: string }
 type LocationOption = AutocompleteOption & { city: string; country: string }

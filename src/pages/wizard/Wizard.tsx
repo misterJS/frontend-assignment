@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useRole } from '../../lib/useRole'
-import useDraft from '../../lib/useDraft'
+import { useRole } from '@/lib/useRole'
+import useDraft from '@/lib/useDraft'
 import Step1, { type Step1Values } from './Step1'
 import Step2, { type Step2Values } from './Step2'
 
