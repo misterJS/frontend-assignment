@@ -56,6 +56,7 @@ const Autocomplete = <T extends AutocompleteOption>({
   const containerRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const listboxId = useId()
+  const skipFetchRef = useRef(false)
 
   const trimmedInput = inputValue.trim()
   const hasQuery = trimmedInput.length >= minChars
@@ -65,6 +66,11 @@ const Autocomplete = <T extends AutocompleteOption>({
   }, [deriveLabel, value])
 
   useEffect(() => {
+    if (skipFetchRef.current) {
+      skipFetchRef.current = false
+      return
+    }
+
     if (!hasQuery) {
       setOptions([])
       setIsOpen(false)
@@ -133,6 +139,7 @@ const Autocomplete = <T extends AutocompleteOption>({
   }
 
   const handleSelect = (option: T) => {
+    skipFetchRef.current = true
     setInputValue(deriveLabel(option))
     setIsOpen(false)
     setOptions([])
