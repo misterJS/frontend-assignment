@@ -2,53 +2,19 @@
   "departments": [
     {
       "id": "1",
-      "name": "Engineering",
-      "head": "Adi"
+      "name": "Engineering"
     },
     {
       "id": "2",
-      "name": "People Ops",
-      "head": "Sinta"
+      "name": "People Ops"
     },
     {
       "id": "3",
-      "name": "Finance",
-      "head": "Rudi"
+      "name": "Finance"
     },
     {
       "id": "4",
-      "name": "Marketing",
-      "head": "Maya"
-    },
-    {
-      "id": "5",
-      "name": "Sales",
-      "head": "Budi"
-    },
-    {
-      "id": "6",
-      "name": "Product",
-      "head": "Nanda"
-    },
-    {
-      "id": "7",
-      "name": "Design",
-      "head": "Citra"
-    },
-    {
-      "id": "8",
-      "name": "Quality Assurance",
-      "head": "Dimas"
-    },
-    {
-      "id": "9",
-      "name": "IT Support",
-      "head": "Farah"
-    },
-    {
-      "id": "10",
-      "name": "Legal",
-      "head": "Hendra"
+      "name": "Marketing"
     }
   ],
   "basicInfo": [
@@ -90,6 +56,19 @@
       "emergencyContact": "",
       "notes": "",
       "createdAt": 1763001815235
+    },
+    {
+      "id": "z-1763004704871",
+      "employeeId": "FXX-001",
+      "departmentId": "3",
+      "department": "Finance",
+      "fullName": "Employee FXX-001",
+      "email": "fxx-001@example.com",
+      "role": "ops",
+      "phone": "",
+      "emergencyContact": "",
+      "notes": "",
+      "createdAt": 1763004704871
     }
   ]
 }
