@@ -15,10 +15,7 @@ import Autocomplete, {
 import PhotoPicker from '@/components/PhotoPicker'
 import { makeEmpId } from '@/lib/empId'
 import delay from '@/lib/delay'
-import {
-  WizardProgress,
-  progressLabels,
-} from '@/lib/progress'
+import { WizardProgress, progressLabels } from '@/lib/progress'
 
 type DepartmentOption = AutocompleteOption & { name: string }
 type LocationOption = AutocompleteOption & { city: string; country: string }
@@ -63,12 +60,7 @@ const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
       employeeId: value.employeeId ? '' : 'Employee ID belum terbentuk.',
       photo: value.photoDataUrl ? '' : 'Foto wajib diunggah.',
     }),
-    [
-      value.department,
-      value.employeeId,
-      value.location,
-      value.photoDataUrl,
-    ],
+    [value.department, value.employeeId, value.location, value.photoDataUrl],
   )
 
   const isValid = Object.values(errors).every((message) => !message)
@@ -158,21 +150,15 @@ const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
       setIsFetchingCount(true)
 
       try {
-        const response = await axios.get(
-          'http://localhost:4001/basicInfo',
-          {
-            params: { departmentId: value.department.id },
-          },
-        )
+        const response = await axios.get('http://localhost:4001/basicInfo', {
+          params: { departmentId: value.department.id },
+        })
         const existingCount = Array.isArray(response.data)
           ? response.data.length
           : 0
         onChange({
           ...value,
-          employeeId: makeEmpId(
-            value.department?.name ?? '',
-            existingCount,
-          ),
+          employeeId: makeEmpId(value.department?.name ?? '', existingCount),
         })
       } catch (error) {
         console.error('Failed to fetch existing count', error)
@@ -192,8 +178,8 @@ const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
         <h2>Step 2 - Additional Details</h2>
         <p className="wizard-form__description">
           Tahap ini dapat diakses oleh <strong>Admin</strong> maupun{' '}
-          <strong>Ops</strong>. Pilih departemen, lokasi, dan unggah foto sebagai
-          bagian dari verifikasi. Role aktif saat ini:{' '}
+          <strong>Ops</strong>. Pilih departemen, lokasi, dan unggah foto
+          sebagai bagian dari verifikasi. Role aktif saat ini:{' '}
           <strong>{role}</strong>.
         </p>
       </div>
@@ -223,9 +209,7 @@ const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
           <span className="form-field__label">ID Karyawan</span>
           <input
             className="form-field__input"
-            value={
-              isFetchingCount ? 'Menghitung...' : value.employeeId || ''
-            }
+            value={isFetchingCount ? 'Menghitung...' : value.employeeId || ''}
             readOnly
           />
           {submitAttempted && errors.employeeId && (
@@ -255,9 +239,7 @@ const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
         </label>
 
         <div
-          className={`form-field${
-            isSubmitting ? ' form-field--disabled' : ''
-          }`}
+          className={`form-field${isSubmitting ? ' form-field--disabled' : ''}`}
         >
           <PhotoPicker
             label="Foto Karyawan"
@@ -274,48 +256,6 @@ const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
           )}
         </div>
 
-        {(progress !== WizardProgress.READY || isSubmitting) && (
-          <div className="wizard-progress">
-            <strong className="wizard-progress__title">Progress</strong>
-            <ol className="wizard-progress__list">
-              {progressSteps.map((stepStatus) => {
-                const isActive = progress === stepStatus
-                const stepIndex = progressSteps.indexOf(stepStatus)
-                const isCompleted =
-                  stepIndex > -1 && stepIndex < currentProgressIndex
-                return (
-                  <li
-                    key={stepStatus}
-                    className={`wizard-progress__item${
-                      isActive
-                        ? ' wizard-progress__item--active'
-                        : isCompleted
-                          ? ' wizard-progress__item--done'
-                          : ''
-                    }`}
-                  >
-                    {progressLabels[stepStatus]}
-                  </li>
-                )
-              })}
-            </ol>
-          </div>
-        )}
-
-        {errorMessage && (
-          <div className="wizard-error">
-            <span>{errorMessage}</span>
-            <button
-              type="button"
-              onClick={handleRetry}
-              disabled={isSubmitting}
-              className="btn btn--danger btn--xs"
-            >
-              Retry
-            </button>
-          </div>
-        )}
-
         <label className="form-field">
           <span className="form-field__label">Catatan Tambahan</span>
           <textarea
@@ -327,6 +267,48 @@ const Step2 = ({ role, basicInfo, value, onChange, onSubmit }: Step2Props) => {
           />
         </label>
       </div>
+
+      {(progress !== WizardProgress.READY || isSubmitting) && (
+        <div className="wizard-progress">
+          <strong className="wizard-progress__title">Progress</strong>
+          <ol className="wizard-progress__list">
+            {progressSteps.map((stepStatus) => {
+              const isActive = progress === stepStatus
+              const stepIndex = progressSteps.indexOf(stepStatus)
+              const isCompleted =
+                stepIndex > -1 && stepIndex < currentProgressIndex
+              return (
+                <li
+                  key={stepStatus}
+                  className={`wizard-progress__item${
+                    isActive
+                      ? ' wizard-progress__item--active'
+                      : isCompleted
+                        ? ' wizard-progress__item--done'
+                        : ''
+                  }`}
+                >
+                  {progressLabels[stepStatus]}
+                </li>
+              )
+            })}
+          </ol>
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="wizard-error">
+          <span>{errorMessage}</span>
+          <button
+            type="button"
+            onClick={handleRetry}
+            disabled={isSubmitting}
+            className="btn btn--danger btn--xs"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       <button
         type="submit"

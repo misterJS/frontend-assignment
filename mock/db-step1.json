@@ -77,6 +77,19 @@
       "emergencyContact": "08128177122",
       "notes": "",
       "createdAt": 1763000093293
+    },
+    {
+      "id": "z-1763001815235",
+      "employeeId": "SXX-001",
+      "departmentId": "5",
+      "department": "Sales",
+      "fullName": "Employee SXX-001",
+      "email": "sxx-001@example.com",
+      "role": "ops",
+      "phone": "",
+      "emergencyContact": "",
+      "notes": "",
+      "createdAt": 1763001815235
     }
   ]
 }
